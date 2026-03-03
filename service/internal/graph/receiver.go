@@ -43,11 +43,13 @@ func (n *receiverNode) buildComponent(ctx context.Context,
 	info component.BuildInfo,
 	builder *builders.ReceiverBuilder,
 	nexts []baseConsumer,
+	destinationIDs []component.ID,
 ) error {
 	set := receiver.Settings{
 		ID:                n.componentID,
 		TelemetrySettings: componentattribute.TelemetrySettingsWithAttributes(tel, *n.Set()),
 		BuildInfo:         info,
+		DestinationIDs:    destinationIDs,
 	}
 
 	tb, err := metadata.NewTelemetryBuilder(set.TelemetrySettings)

@@ -267,6 +267,11 @@ func (g *Graph) createEdges() {
 		for _, receiver := range pg.receivers {
 			g.componentGraph.SetEdge(g.componentGraph.NewEdge(receiver, pg.capabilitiesNode))
 		}
+		for _, processor := range pg.processors {
+			if n, ok := processor.(componentNode); ok {
+				pg.capabilitiesNode.destinations = append(pg.capabilitiesNode.destinations, n.getComponentID())
+			}
+		}
 
 		// Iterates through processors, chaining them together.  starts with the capabilities node.
 		var from, to graph.Node
@@ -301,7 +306,7 @@ func (g *Graph) buildComponents(ctx context.Context, set Settings) error {
 
 		switch n := node.(type) {
 		case *receiverNode:
-			err = n.buildComponent(ctx, set.Telemetry, set.BuildInfo, set.ReceiverBuilder, g.nextConsumers(n.ID()))
+			err = n.buildComponent(ctx, set.Telemetry, set.BuildInfo, set.ReceiverBuilder, g.nextConsumers(n.ID()), g.destinationIDs(n.ID()))
 		case *processorNode:
 			// nextConsumers is guaranteed to be length 1.  Either it is the next processor or it is the fanout node for the exporters.
 			err = n.buildComponent(ctx, set.Telemetry, set.BuildInfo, set.ProcessorBuilder, g.nextConsumers(n.ID())[0], g.destinationIDs(n.ID()))

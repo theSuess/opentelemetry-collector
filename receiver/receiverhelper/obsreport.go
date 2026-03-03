@@ -30,6 +30,8 @@ type ObsReport struct {
 	tracer         trace.Tracer
 
 	otelAttrs        metric.MeasurementOption
+	destinationAttrs []metric.MeasurementOption
+
 	telemetryBuilder *metadata.TelemetryBuilder
 }
 
@@ -59,16 +61,29 @@ func newReceiver(cfg ObsReportSettings) (*ObsReport, error) {
 	if err != nil {
 		return nil, err
 	}
+	base := attribute.NewSet(
+		attribute.String(internal.ReceiverKey, cfg.ReceiverID.String()),
+		attribute.String(internal.TransportKey, cfg.Transport),
+	)
+	destAttrs := make([]metric.MeasurementOption, 0, len(cfg.ReceiverCreateSettings.DestinationIDs))
+	for _, dest := range cfg.ReceiverCreateSettings.DestinationIDs {
+		destAttrs = append(destAttrs, metric.WithAttributeSet(attribute.NewSet(
+			attribute.String("destination", dest.String()),
+		)))
+	}
+	if len(destAttrs) == 0 {
+		// Fallback: record without destination if IDs are not available.
+		destAttrs = []metric.MeasurementOption{metric.WithAttributeSet(attribute.NewSet())}
+	}
+
 	return &ObsReport{
 		spanNamePrefix: internal.ReceiverKey + internal.SpanNameSep + cfg.ReceiverID.String(),
 		transport:      cfg.Transport,
 		longLivedCtx:   cfg.LongLivedCtx,
 		tracer:         cfg.ReceiverCreateSettings.TracerProvider.Tracer(cfg.ReceiverID.String()),
 
-		otelAttrs: metric.WithAttributeSet(attribute.NewSet(
-			attribute.String(internal.ReceiverKey, cfg.ReceiverID.String()),
-			attribute.String(internal.TransportKey, cfg.Transport),
-		)),
+		otelAttrs:        metric.WithAttributeSet(base),
+		destinationAttrs: destAttrs,
 		telemetryBuilder: telemetryBuilder,
 	}, nil
 }
@@ -270,7 +285,9 @@ func (rec *ObsReport) recordMetrics(receiverCtx context.Context, signal pipeline
 		failedMeasure = rec.telemetryBuilder.ReceiverFailedProfileSamples
 	}
 
-	acceptedMeasure.Add(receiverCtx, int64(numAccepted), rec.otelAttrs)
-	refusedMeasure.Add(receiverCtx, int64(numRefused), rec.otelAttrs)
-	failedMeasure.Add(receiverCtx, int64(numFailedErrors), rec.otelAttrs)
+	for _, destAttrs := range rec.destinationAttrs {
+		acceptedMeasure.Add(receiverCtx, int64(numAccepted), rec.otelAttrs, destAttrs)
+		refusedMeasure.Add(receiverCtx, int64(numRefused), rec.otelAttrs, destAttrs)
+		failedMeasure.Add(receiverCtx, int64(numFailedErrors), rec.otelAttrs, destAttrs)
+	}
 }

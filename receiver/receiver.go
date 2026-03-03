@@ -49,6 +49,10 @@ type Settings struct {
 	// BuildInfo can be used by components for informational purposes.
 	BuildInfo component.BuildInfo
 
+	// DestinationIDs are the component IDs of the direct downstream consumers of this receiver.
+	// The slice has one entry per exporter when the pipeline fans out.
+	DestinationIDs []component.ID
+
 	// prevent unkeyed literal initialization
 	_ struct{}
 }
