@@ -41,6 +41,8 @@ func newProcessorNode(pipelineID pipeline.ID, procID component.ID) *processorNod
 	}
 }
 
+func (n *processorNode) getComponentID() component.ID { return n.componentID }
+
 func (n *processorNode) getConsumer() baseConsumer {
 	return n.consumer
 }
@@ -50,11 +52,13 @@ func (n *processorNode) buildComponent(ctx context.Context,
 	info component.BuildInfo,
 	builder *builders.ProcessorBuilder,
 	next baseConsumer,
+	destinationIDs []component.ID,
 ) error {
 	set := processor.Settings{
 		ID:                n.componentID,
 		TelemetrySettings: componentattribute.TelemetrySettingsWithAttributes(tel, *n.Set()),
 		BuildInfo:         info,
+		DestinationIDs:    destinationIDs,
 	}
 
 	tb, err := metadata.NewTelemetryBuilder(set.TelemetrySettings)

@@ -41,6 +41,8 @@ func newExporterNode(pipelineType pipeline.Signal, exprID component.ID) *exporte
 	}
 }
 
+func (n *exporterNode) getComponentID() component.ID { return n.componentID }
+
 func (n *exporterNode) getConsumer() baseConsumer {
 	return n.consumer
 }

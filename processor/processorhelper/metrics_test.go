@@ -130,14 +130,14 @@ func TestMetrics_RecordInOut(t *testing.T) {
 		[]metricdata.DataPoint[int64]{
 			{
 				Value:      2,
-				Attributes: attribute.NewSet(attribute.String("processor", "processorhelper"), attribute.String("otel.signal", "metrics")),
+				Attributes: attribute.NewSet(attribute.String("processor", "processorhelper"), attribute.String("otel.signal", "metrics"), attribute.String("destination", "test")),
 			},
 		}, metricdatatest.IgnoreTimestamp())
 	metadatatest.AssertEqualProcessorOutgoingItems(t, tel,
 		[]metricdata.DataPoint[int64]{
 			{
 				Value:      3,
-				Attributes: attribute.NewSet(attribute.String("processor", "processorhelper"), attribute.String("otel.signal", "metrics")),
+				Attributes: attribute.NewSet(attribute.String("processor", "processorhelper"), attribute.String("otel.signal", "metrics"), attribute.String("destination", "test")),
 			},
 		}, metricdatatest.IgnoreTimestamp())
 }
@@ -167,14 +167,14 @@ func TestMetrics_RecordIn_ErrorOut(t *testing.T) {
 		[]metricdata.DataPoint[int64]{
 			{
 				Value:      2,
-				Attributes: attribute.NewSet(attribute.String("processor", "processorhelper"), attribute.String("otel.signal", "metrics")),
+				Attributes: attribute.NewSet(attribute.String("processor", "processorhelper"), attribute.String("otel.signal", "metrics"), attribute.String("destination", "test")),
 			},
 		}, metricdatatest.IgnoreTimestamp())
 	metadatatest.AssertEqualProcessorOutgoingItems(t, tel,
 		[]metricdata.DataPoint[int64]{
 			{
 				Value:      0,
-				Attributes: attribute.NewSet(attribute.String("processor", "processorhelper"), attribute.String("otel.signal", "metrics")),
+				Attributes: attribute.NewSet(attribute.String("processor", "processorhelper"), attribute.String("otel.signal", "metrics"), attribute.String("destination", "test")),
 			},
 		}, metricdatatest.IgnoreTimestamp())
 }

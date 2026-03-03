@@ -7,6 +7,11 @@ status:
   stability:
     beta: [traces, metrics, logs]
 
+attributes:
+  destination:
+    description: The ID of the component receiving data from this processor.
+    type: string
+
 telemetry:
   metrics:
     processor_incoming_items:
@@ -35,3 +40,4 @@ telemetry:
       sum:
         value_type: int
         monotonic: true
+      attributes: [destination]

@@ -304,7 +304,7 @@ func (g *Graph) buildComponents(ctx context.Context, set Settings) error {
 			err = n.buildComponent(ctx, set.Telemetry, set.BuildInfo, set.ReceiverBuilder, g.nextConsumers(n.ID()))
 		case *processorNode:
 			// nextConsumers is guaranteed to be length 1.  Either it is the next processor or it is the fanout node for the exporters.
-			err = n.buildComponent(ctx, set.Telemetry, set.BuildInfo, set.ProcessorBuilder, g.nextConsumers(n.ID())[0])
+			err = n.buildComponent(ctx, set.Telemetry, set.BuildInfo, set.ProcessorBuilder, g.nextConsumers(n.ID())[0], g.destinationIDs(n.ID()))
 		case *exporterNode:
 			err = n.buildComponent(ctx, set.Telemetry, set.BuildInfo, set.ExporterBuilder)
 		case *connectorNode:
@@ -337,7 +337,9 @@ func (g *Graph) buildComponents(ctx context.Context, set Settings) error {
 				n.ConsumeProfilesFunc = cc.ConsumeProfiles
 			}
 		case *fanOutNode:
-			nexts := g.nextConsumers(n.ID())
+			id := n.ID()
+			nexts := g.nextConsumers(id)
+			n.destinations = g.destinationIDs(id)
 			switch n.pipelineID.Signal() {
 			case pipeline.SignalTraces:
 				consumers := make([]consumer.Traces, 0, len(nexts))
@@ -367,6 +369,24 @@ func (g *Graph) buildComponents(ctx context.Context, set Settings) error {
 		}
 		if err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+// destinationIDs returns the component IDs of the named components downstream of nodeID.
+// It traverses through a fanOutNode transparently, since fanOut is always present but has no ID.
+func (g *Graph) destinationIDs(nodeID int64) []component.ID {
+	nextNodes := g.componentGraph.From(nodeID)
+	for nextNodes.Next() {
+		next := nextNodes.Node()
+		switch n := next.(type) {
+		case *capabilitiesNode:
+			return n.destinations
+		case *fanOutNode:
+			return n.destinations
+		case componentNode:
+			return []component.ID{n.getComponentID()}
 		}
 	}
 	return nil

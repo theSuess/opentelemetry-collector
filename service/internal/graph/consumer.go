@@ -4,6 +4,7 @@
 package graph // import "go.opentelemetry.io/collector/service/internal/graph"
 
 import (
+	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 )
 
@@ -14,4 +15,8 @@ type baseConsumer interface {
 
 type consumerNode interface {
 	getConsumer() baseConsumer
+}
+
+type componentNode interface {
+	getComponentID() component.ID
 }

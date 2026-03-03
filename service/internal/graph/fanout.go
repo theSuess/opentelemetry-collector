@@ -4,6 +4,7 @@
 package graph // import "go.opentelemetry.io/collector/service/internal/graph"
 
 import (
+	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/pipeline"
 	"go.opentelemetry.io/collector/service/internal/attribute"
 )
@@ -14,7 +15,8 @@ var _ consumerNode = (*fanOutNode)(nil)
 // Therefore, nodeID is derived from "pipeline ID".
 type fanOutNode struct {
 	attribute.Attributes
-	pipelineID pipeline.ID
+	pipelineID   pipeline.ID
+	destinations []component.ID
 	baseConsumer
 }
 

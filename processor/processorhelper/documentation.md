@@ -29,3 +29,9 @@ Number of items emitted from the processor.
 | Unit | Metric Type | Value Type | Monotonic | Stability |
 | ---- | ----------- | ---------- | --------- | --------- |
 | {item} | Sum | Int | true | Alpha |
+
+#### Attributes
+
+| Name | Description | Values |
+| ---- | ----------- | ------ |
+| destination | The ID of the component receiving data from this processor. | Any Str |

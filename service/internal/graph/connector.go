@@ -46,6 +46,8 @@ func newConnectorNode(exprPipelineType, rcvrPipelineType pipeline.Signal, connID
 	}
 }
 
+func (n *connectorNode) getComponentID() component.ID { return n.componentID }
+
 func (n *connectorNode) getConsumer() baseConsumer {
 	return n.consumer
 }
