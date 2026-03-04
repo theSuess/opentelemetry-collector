@@ -267,11 +267,6 @@ func (g *Graph) createEdges() {
 		for _, receiver := range pg.receivers {
 			g.componentGraph.SetEdge(g.componentGraph.NewEdge(receiver, pg.capabilitiesNode))
 		}
-		for _, processor := range pg.processors {
-			if n, ok := processor.(componentNode); ok {
-				pg.capabilitiesNode.destinations = append(pg.capabilitiesNode.destinations, n.getComponentID())
-			}
-		}
 
 		// Iterates through processors, chaining them together.  starts with the capabilities node.
 		var from, to graph.Node
@@ -322,7 +317,10 @@ func (g *Graph) buildComponents(ctx context.Context, set Settings) error {
 			for _, proc := range g.pipelines[n.pipelineID].processors {
 				capability.MutatesData = capability.MutatesData || proc.(*processorNode).getConsumer().Capabilities().MutatesData
 			}
-			next := g.nextConsumers(n.ID())[0]
+			id := n.ID()
+			destinations := g.destinationIDs(id)
+			n.destinations = destinations
+			next := g.nextConsumers(id)[0]
 			switch n.pipelineID.Signal() {
 			case pipeline.SignalTraces:
 				cc := capabilityconsumer.NewTraces(next.(consumer.Traces), capability)
@@ -383,18 +381,19 @@ func (g *Graph) buildComponents(ctx context.Context, set Settings) error {
 // It traverses through a fanOutNode transparently, since fanOut is always present but has no ID.
 func (g *Graph) destinationIDs(nodeID int64) []component.ID {
 	nextNodes := g.componentGraph.From(nodeID)
+	out := []component.ID{}
 	for nextNodes.Next() {
 		next := nextNodes.Node()
 		switch n := next.(type) {
 		case *capabilitiesNode:
-			return n.destinations
+			out = append(out, n.destinations...)
 		case *fanOutNode:
-			return n.destinations
+			out = append(out, n.destinations...)
 		case componentNode:
-			return []component.ID{n.getComponentID()}
+			out = append(out, n.getComponentID())
 		}
 	}
-	return nil
+	return out
 }
 
 // Find all nodes
