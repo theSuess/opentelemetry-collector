@@ -118,3 +118,11 @@ telemetry:
       sum:
         value_type: int
         monotonic: true
+    processor_outgoing_items:
+      enabled: true
+      stability: alpha
+      description: Number of items emitted from the processor.
+      unit: "{items}"
+      sum:
+        value_type: int
+        monotonic: true

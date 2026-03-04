@@ -99,3 +99,19 @@ func AssertEqualProcessorBatchTimeoutTriggerSend(t *testing.T, tt *componenttest
 	require.NoError(t, err)
 	metricdatatest.AssertEqual(t, want, got, opts...)
 }
+
+func AssertEqualProcessorOutgoingItems(t *testing.T, tt *componenttest.Telemetry, dps []metricdata.DataPoint[int64], opts ...metricdatatest.Option) {
+	want := metricdata.Metrics{
+		Name:        "otelcol_processor_outgoing_items",
+		Description: "Number of items emitted from the processor. [Alpha]",
+		Unit:        "{items}",
+		Data: metricdata.Sum[int64]{
+			Temporality: metricdata.CumulativeTemporality,
+			IsMonotonic: true,
+			DataPoints:  dps,
+		},
+	}
+	got, err := tt.GetMetric("otelcol_processor_outgoing_items")
+	require.NoError(t, err)
+	metricdatatest.AssertEqual(t, want, got, opts...)
+}

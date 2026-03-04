@@ -45,3 +45,11 @@ Number of times the batch was sent due to a timeout trigger
 | Unit | Metric Type | Value Type | Monotonic | Stability |
 | ---- | ----------- | ---------- | --------- | --------- |
 | {time} | Sum | Int | true | Development |
+
+### otelcol_processor_outgoing_items
+
+Number of items emitted from the processor.
+
+| Unit | Metric Type | Value Type | Monotonic | Stability |
+| ---- | ----------- | ---------- | --------- | --------- |
+| {items} | Sum | Int | true | Alpha |

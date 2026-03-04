@@ -33,6 +33,7 @@ type TelemetryBuilder struct {
 	ProcessorBatchBatchSizeTriggerSend metric.Int64Counter
 	ProcessorBatchMetadataCardinality  metric.Int64ObservableUpDownCounter
 	ProcessorBatchTimeoutTriggerSend   metric.Int64Counter
+	ProcessorOutgoingItems             metric.Int64Counter
 }
 
 // TelemetryBuilderOption applies changes to default builder.
@@ -119,6 +120,12 @@ func NewTelemetryBuilder(settings component.TelemetrySettings, options ...Teleme
 		"otelcol_processor_batch_timeout_trigger_send",
 		metric.WithDescription("Number of times the batch was sent due to a timeout trigger [Development]"),
 		metric.WithUnit("{time}"),
+	)
+	errs = errors.Join(errs, err)
+	builder.ProcessorOutgoingItems, err = builder.meter.Int64Counter(
+		"otelcol_processor_outgoing_items",
+		metric.WithDescription("Number of items emitted from the processor. [Alpha]"),
+		metric.WithUnit("{items}"),
 	)
 	errs = errors.Join(errs, err)
 	return &builder, errs

@@ -28,6 +28,7 @@ func TestSetupTelemetry(t *testing.T) {
 	tb.ProcessorBatchBatchSendSizeBytes.Record(context.Background(), 1)
 	tb.ProcessorBatchBatchSizeTriggerSend.Add(context.Background(), 1)
 	tb.ProcessorBatchTimeoutTriggerSend.Add(context.Background(), 1)
+	tb.ProcessorOutgoingItems.Add(context.Background(), 1)
 	AssertEqualProcessorBatchBatchSendSize(t, testTel,
 		[]metricdata.HistogramDataPoint[int64]{{}}, metricdatatest.IgnoreValue(),
 		metricdatatest.IgnoreTimestamp())
@@ -41,6 +42,9 @@ func TestSetupTelemetry(t *testing.T) {
 		[]metricdata.DataPoint[int64]{{Value: 1}},
 		metricdatatest.IgnoreTimestamp())
 	AssertEqualProcessorBatchTimeoutTriggerSend(t, testTel,
+		[]metricdata.DataPoint[int64]{{Value: 1}},
+		metricdatatest.IgnoreTimestamp())
+	AssertEqualProcessorOutgoingItems(t, testTel,
 		[]metricdata.DataPoint[int64]{{Value: 1}},
 		metricdatatest.IgnoreTimestamp())
 
