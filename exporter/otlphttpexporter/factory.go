@@ -21,6 +21,7 @@ import (
 	"go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper"
 	"go.opentelemetry.io/collector/exporter/otlphttpexporter/internal/metadata"
 	"go.opentelemetry.io/collector/exporter/xexporter"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // NewFactory creates a factory for OTLP exporter.
@@ -98,7 +99,9 @@ func createTraces(
 		// explicitly disable since we rely on http.Client timeout logic.
 		exporterhelper.WithTimeout(exporterhelper.TimeoutConfig{Timeout: 0}),
 		exporterhelper.WithRetry(oCfg.RetryConfig),
-		exporterhelper.WithQueue(oCfg.QueueConfig))
+		exporterhelper.WithQueue(oCfg.QueueConfig),
+		exporterhelper.WithAttrs(attribute.String("endpoint", oCfg.ClientConfig.Endpoint)),
+	)
 }
 
 func createMetrics(
@@ -124,7 +127,9 @@ func createMetrics(
 		// explicitly disable since we rely on http.Client timeout logic.
 		exporterhelper.WithTimeout(exporterhelper.TimeoutConfig{Timeout: 0}),
 		exporterhelper.WithRetry(oCfg.RetryConfig),
-		exporterhelper.WithQueue(oCfg.QueueConfig))
+		exporterhelper.WithQueue(oCfg.QueueConfig),
+		exporterhelper.WithAttrs(attribute.String("endpoint", oCfg.ClientConfig.Endpoint)),
+	)
 }
 
 func createLogs(
@@ -149,7 +154,9 @@ func createLogs(
 		// explicitly disable since we rely on http.Client timeout logic.
 		exporterhelper.WithTimeout(exporterhelper.TimeoutConfig{Timeout: 0}),
 		exporterhelper.WithRetry(oCfg.RetryConfig),
-		exporterhelper.WithQueue(oCfg.QueueConfig))
+		exporterhelper.WithQueue(oCfg.QueueConfig),
+		exporterhelper.WithAttrs(attribute.String("endpoint", oCfg.ClientConfig.Endpoint)),
+	)
 }
 
 func createProfiles(
@@ -175,5 +182,7 @@ func createProfiles(
 		// explicitly disable since we rely on http.Client timeout logic.
 		exporterhelper.WithTimeout(exporterhelper.TimeoutConfig{Timeout: 0}),
 		exporterhelper.WithRetry(oCfg.RetryConfig),
-		exporterhelper.WithQueue(oCfg.QueueConfig))
+		exporterhelper.WithQueue(oCfg.QueueConfig),
+		exporterhelper.WithAttrs(attribute.String("endpoint", oCfg.ClientConfig.Endpoint)),
+	)
 }

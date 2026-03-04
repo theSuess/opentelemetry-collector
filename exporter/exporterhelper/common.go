@@ -8,6 +8,7 @@ import (
 	"go.opentelemetry.io/collector/config/configretry"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/exporter/exporterhelper/internal"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // Option apply changes to BaseExporter.
@@ -42,4 +43,8 @@ func WithRetry(config configretry.BackOffConfig) Option {
 // TODO: Verify if we can change the default to be mutable as we do for processors.
 func WithCapabilities(capabilities consumer.Capabilities) Option {
 	return internal.WithCapabilities(capabilities)
+}
+
+func WithAttrs(attrs ...attribute.KeyValue) Option {
+	return internal.WithAttributes(attrs...)
 }
